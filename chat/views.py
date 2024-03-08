@@ -1,10 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from.models import Messaging,Connect,User
 from.serializers import MessagingSerializer,UserSerialzer
-import json
 # Create your views here.
 @api_view(['GET'])
 def continous_chat(request,reciever,sender):
@@ -29,6 +28,7 @@ def post_message(request):
     data=request.data   
     by=data['by']
     to=data['to']
+    print(by,to)
     sender=Connect.objects.get(user_id=by).pk
     reciever=Connect.objects.get(user_id=to).pk
     data['by']=sender

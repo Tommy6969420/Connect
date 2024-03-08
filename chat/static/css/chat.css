@@ -1,0 +1,158 @@
+
+.connected{
+  width: 100%;
+  border-radius: 10px;
+  background: linear-gradient(to right,#4CAF50, rgb(6, 141, 40));
+  height: 100px;
+  display: flex;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.friends {
+  width:10%;
+  margin:auto;
+  position: relative;
+  text-align: center;
+  align-items: center;
+  justify-content:flex-start;
+  color: rgb(16, 123, 216);
+  font-size: 24px;
+  font-weight: bold;
+  background: rgb(0, 255, 136);
+  border: 1px solid red;
+  padding: 10px;
+  border-radius: 10px;
+    }
+  .friends:hover {
+  color: rgb(226, 226, 226);
+  border: 1px solid rgb(0, 255, 42);
+  background-color: rgba(18, 18, 234, 0.795);
+}
+#sendMessage{
+
+  display:block;
+  position:float;
+}
+
+#sender{
+  display:none;
+}
+    /* Chat containers */
+.container {
+  font-size: 25px;
+  border: 2px solid #dedede;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+  width: 30%;
+  text-align: start;
+  position:relative;
+  left: 0px;
+  right: 65%;   
+
+}
+.date{
+font-size:15px;
+
+}
+/* Darker chat container */
+.darker {
+  border-color: #ccc;
+  background-color: #ddd;
+  align-items: end;
+  width: 30%;
+  text-align: end;
+  position:relative;
+  right: 0px;
+  left: 65%;
+  
+
+}
+/* Clear floats */
+.container::after {
+  content: "";
+  clear: both;
+}
+#sendMessage{
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #dedede;
+  background-color: #f1f1f1;
+  width: 100%;
+  margin: 10px 0;
+  text-align: start;
+  position: fixed;
+  bottom:0px;
+  left: 0px;
+  right: 65%;   
+}
+#inputMsg {
+width: 90%;
+padding: 10px 20px;
+margin: 8px 0;
+box-sizing: border-box;
+border: 2px solid #ccc;
+border-radius: 4px;
+background-color: #f8f8f8;
+font-size: 16px;
+transition: 0.3s;
+}
+
+#inputMsg:focus {
+border-color: #4CAF50;
+box-shadow: 0 0 8px #4CAF50;
+}
+#msgBtn {
+background-color: #4CAF50; /* Green background */
+border: none; /* Remove border */
+color: white; /* White text */
+padding: 15px 32px; /* Some padding */
+text-align: center; /* Centered text */
+text-decoration: none; /* Remove underline */
+display: inline-block;
+font-size: 16px;
+margin: 4px 2px;
+cursor: pointer; /* Mouse pointer on hover */
+transition-duration: 0.4s; /* Transition effects */
+border-radius: 12px; /* Rounded corners */
+}
+
+#msgBtn:hover {
+background-color: white; /* White background */
+color: #4CAF50; /* Green text */
+border: 2px solid #4CAF50; /* Green border */
+}
+
+
+/* Style for the message container */
+#messageContainer {
+display: flex;
+flex-direction: column;
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+max-height: 400px;
+overflow-y: auto;
+}
+
+/* Style for individual messages */
+.message {
+margin-bottom: 10px;
+padding: 10px;
+border-radius: 5px;
+}
+
+/* Different styles for sent and received messages */
+#sendMessage {
+align-self: flex-end;
+background-color: #4CAF50;
+color: white;
+}
+
+.container {
+align-self: flex-start;
+background-color: #f8f8f8;
+border: 1px solid #ccc;
+}
