@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect</title>
+  <style>
+    .friends {
+      color: rgb(16, 123, 216);
+      font-size: 24px;
+      font-weight: bold;
+      display: inline-block;
+      background: rgb(0, 255, 136);
+      border: 3px solid red;
+      padding: 10px;
+      border-radius: 10%;
+    }
+
+    .friends:hover {
+      color: rgb(226, 226, 226);
+      font-size: 24px;
+      font-weight: bold;
+
+      padding: 13px;
+      border: 1px solid rgb(0, 255, 42);
+      border-radius: 25%;
+
+      background: rgba(14, 14, 218, 0.795);
+
+
+    }
+        /* Chat containers */
+    .container {
+      border: 2px solid #dedede;
+      background-color: #f1f1f1;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px 0;
+      width: 30%;
+      text-align: start;
+      position:relative;
+      left: 0px;
+      right: 65%;   
+    
+    }
+
+    /* Darker chat container */
+    .darker {
+      border-color: #ccc;
+      background-color: #ddd;
+      align-items: end;
+      width: 30%;
+      text-align: end;
+      position:relative;
+      right: 0px;
+      left: 65%;
+      
+
+    }
+    /* Clear floats */
+    .container::after {
+      content: "";
+      clear: both;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div>
+    <h1 id="username">{%for us in user%}
+      {{us.username}}
+      {%endfor%}
+    </h1>
+  </div>
+  <div class="connected">
+    <p id="reciever">
+    </p>
+
+    {% for reciever in recievers %}
+    <p onclick="openChat({{reciever.friends__id}})" class="friends" id="txt{{reciever.friends__id}}">
+      {{reciever.friends__username}}
+    </p>
+    {% endfor %}
+
+
+  </div>
+  <div id="messageContainer">
+    <div class="container" >
+      <p>Hello. How are you today?</p>
+    </div>
+
+    <div class="container darker" id="messageContainer">
+      <p>Hey! I'm fine. Thanks for asking!</p>
+    </div>
+  </div>
+<div class="sendMessage">
+  <p>Send Messages:</p>
+  <form method="POST">
+
+    {% csrf_token %}
+    <input type="text" name="message" id='message'>
+    <input type="submit" value="submit">
+  </form>
+</div>
+  
+  <script>
+    let user_by = {%for by in user %}{{ by.id }} {% endfor %}
+    let user_by_username = "{%for by in user%}{{by.username}}{%endfor%}"
+    let user_to = '  '
+    var api_get_msg = `${window.location}get-api/`
+    var api_get_user = `${window.location}get-user/`
+    let msg_div = document.getElementById("messageContainer");
+    function openChat(to) {
+        resetBg()
+      document.getElementById(`txt${to}`).style="background:aqua;border-color:aqua;"
+      msg_div.innerHTML = ""
+      get_msg = `${api_get_msg}${to}/${user_by}`
+      fetch(get_msg)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Chat fetching error');
+          }
+          return response.json();
+        })
+        .then(data => {
+          var data = data['data']
+          if (data.length >= 1) {
+            console.log(data)
+            for (var i = 0; i < data.length; i++) {
+              txts = data[`${i}`]["message"]
+              msg_div.innerHTML += `<div class="container darker"><p> ${txts} :${user_by_username}</div></p>`
+            }
+
+          } else console.log("No messages")
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+    function resetBg() {
+  var friends = document.getElementsByClassName('friends');
+  for(i = 0; i < friends.length; i++) {
+    friends[i].style='background: rgb(0, 255, 136);';
+  }
+}
+  </script>
+</body>
+
+</html>

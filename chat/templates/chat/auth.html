@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>{% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat application using django_rest</title>
+</head>
+<body>
+<!-- Navbar start -->
+    <header class="navSection">
+    <h1 class="logo">Chat Application Using Django Rest Framework</h1>
+    </header>
+<!-- Login Card Start -->
+    <div class="container">
+        <div class="card">
+    <div class="top">
+        <h1 class="signUp">Log In</h1>
+    </div>
+    <div class="bottom">
+        <form action="{% url 'login' %}"  method='post'>
+            {%csrf_token%}
+            <div class="response">
+                <p>{{response}}</p>
+            </div>
+            <div class="inputSection">
+                
+                <label for="Username" class="username">Username</label>
+                <input type="text" placeholder = "Enter Your Username" name="username" required>
+            </div>
+            <div class="inputSection">
+                <label for="Password" class="password">Password</label>
+                <input type="text" name="password" placeholder = "Please Enter a Valid Password" required>
+            </div>
+        
+        <button type='submit' class="btn">Login</button>
+    </form>
+        {% comment %} <p class="fillers">Don't have an account ?<a href="/Signup.html">Sign Up</a></p> {% endcomment %}
+    </div>
+    </div>
+    </div>
+</body>
+</html>
