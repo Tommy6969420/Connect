@@ -4,11 +4,19 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from.models import Messaging,Connect,User
 from.serializers import MessagingSerializer,UserSerialzer
-
+import json
 # Create your views here.
 @api_view(['GET'])
+def continous_chat(request,reciever,sender):
+    recieved=Messaging.objects.filter(to__user__id=sender,by__user__id=reciever).order_by('-id')[0:1]
+    sent=Messaging.objects.filter(by__user__id=sender,to__user__id=reciever).order_by('-id')[0:1]
+    sent_serializer=MessagingSerializer(recieved,many=True)
+    recieved_serializer=MessagingSerializer(sent,many=True)
+    if sent_serializer or recieved_serializer ==True:
+        return Response({"status":200,"message":"Got it","data":sent_serializer.data,"recieved":recieved_serializer.data})
+    return Response({"status":404,"message":"Message not found","data":sent_serializer.data,'recieved':recieved_serializer.data})
+@api_view(['GET'])
 def get_message(request,reciever,sender):
-    print("works",sender,reciever)
     recieved=Messaging.objects.filter(to__user__id=sender,by__user__id=reciever)
     sent=Messaging.objects.filter(by__user__id=sender,to__user__id=reciever)
     sent_serializer=MessagingSerializer(recieved,many=True)
@@ -16,12 +24,21 @@ def get_message(request,reciever,sender):
     if sent_serializer or recieved_serializer ==True:
         return Response({"status":200,"message":"Got it","data":sent_serializer.data,"recieved":recieved_serializer.data})
     return Response({"status":404,"message":"Message not found","data":sent_serializer.data,'recieved':recieved_serializer.data})
-@api_view(['POST'])
+@api_view(['POST',"GET"])
 def post_message(request):
-    data=request.data 
+    data=request.data   
+    by=data['by']
+    to=data['to']
+    sender=Connect.objects.get(user_id=by).pk
+    reciever=Connect.objects.get(user_id=to).pk
+    data['by']=sender
+    data["to"]=reciever
     serializer = MessagingSerializer(data=data)
-    serializer.save()
-    return Response({"status":200,"message":"Your data was sent","data":data})
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"status":200,"message":"Your data was sent","data":serializer.data})
+    else:
+        return Response({"status":420,"message":"Error happened","data":serializer.errors})
 @api_view(['GET'])
 def get_user(request,id):
     queryset=User.objects.get(id=id)
@@ -32,7 +49,6 @@ def authenticate(request):
         username=request.POST.get("username")
         password=request.POST.get("password")
         users=User.objects.values("username","password")
-        print(users.count())
         usernames=[users[i]["username"]for i in range(users.count())]
         passwords=[users[i]["password"]for i in range(users.count())]
         try:
@@ -47,7 +63,6 @@ def authenticate(request):
         except ValueError:
             context={'response':'Username not found'}
             return render(request,"chat/auth.html",context)
-        print(passwords)
     context={'response':'Please enter your credentials'}
     return render(request,"chat/auth.html",context)
 def index(request):
@@ -60,7 +75,6 @@ def index(request):
             "user":user,
             "recievers":connected,
         }
-        print(connected)
         return render(request,"chat/index.html",context)
     else:
         return redirect('login/')

@@ -6,80 +6,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connect</title>
   <style>
-    .friends {
-      color: rgb(16, 123, 216);
-      font-size: 24px;
-      font-weight: bold;
-      display: inline-block;
-      background: rgb(0, 255, 136);
-      border: 3px solid red;
-      padding: 10px;
-      border-radius: 10%;
-    }
+                .friends {
+              color: rgb(16, 123, 216);
+              font-size: 24px;
+              font-weight: bold;
+              display: inline-block;
+              background: rgb(0, 255, 136);
+              border: 3px solid red;
+              padding: 10px;
+              border-radius: 10%;
+                }
 
-    .friends:hover {
-      color: rgb(226, 226, 226);
-      font-size: 24px;
-      font-weight: bold;
+                .friends:hover {
+              color: rgb(226, 226, 226);
+              font-size: 24px;
+              font-weight: bold;
 
-      padding: 13px;
-      border: 1px solid rgb(0, 255, 42);
-      border-radius: 25%;
+              padding: 13px;
+              border: 1px solid rgb(0, 255, 42);
+              border-radius: 25%;
 
-      background: rgba(14, 14, 218, 0.795);
+              background: rgba(14, 14, 218, 0.795);
 
 
-    }
-        /* Chat containers */
-    .container {
-      border: 2px solid #dedede;
-      background-color: #f1f1f1;
-      border-radius: 5px;
-      padding: 10px;
-      margin: 10px 0;
-      width: 30%;
-      text-align: start;
-      position:relative;
-      left: 0px;
-      right: 65%;   
-    
-    }
+            }
+            #sender{
+              display:none;
+            }
+                /* Chat containers */
+            .container {
+              font-size: 25px;
+              border: 2px solid #dedede;
+              background-color: #f1f1f1;
+              border-radius: 5px;
+              padding: 10px;
+              margin: 10px 0;
+              width: 30%;
+              text-align: start;
+              position:relative;
+              left: 0px;
+              right: 65%;   
+            
+            }
+            .date{
+          font-size:15px;
 
-    /* Darker chat container */
-    .darker {
-      border-color: #ccc;
-      background-color: #ddd;
-      align-items: end;
-      width: 30%;
-      text-align: end;
-      position:relative;
-      right: 0px;
-      left: 65%;
-      
+        }
+            /* Darker chat container */
+            .darker {
+              border-color: #ccc;
+              background-color: #ddd;
+              align-items: end;
+              width: 30%;
+              text-align: end;
+              position:relative;
+              right: 0px;
+              left: 65%;
+              
 
-    }
-    /* Clear floats */
-    .container::after {
-      content: "";
-      clear: both;
-    }
+            }
+            /* Clear floats */
+            .container::after {
+              content: "";
+              clear: both;
+            }
 
   </style>
 </head>
 
 <body>
   <div>
-    <h1 id="username">{%for us in user%}
-      {{us.username}}
-      {%endfor%}
-    </h1>
+    {%for us in user%}<h1 id="username">
+      {{us.username}} 
+      
+    </h1><p id="sender">{{us.id}}</p>{%endfor%}
   </div>
   <div class="connected">
-    <p id="reciever">
-    </p>
+  
 
     {% for reciever in recievers %}
-    <p onclick="openChat({{reciever.friends__id}})" class="friends" id="txt{{reciever.friends__id}}">
+    <p onclick="openChat({{reciever.friends__id}})"  class="friends" id="txt{{reciever.friends__id}}">
       {{reciever.friends__username}}
     </p>
     {% endfor %}
@@ -88,24 +94,23 @@
   </div>
   <div id="messageContainer">
   </div>
-<div class="sendMessage">
-  <p>Send Messages:</p>
-  <form method="POST">
-
-    {% csrf_token %}
-    <input type="text" name="message" id='message'>
-    <input type="submit" value="submit">
-  </form>
+<div class="sendMessage" id="sendMessage">
+  <p>Send Messages:</p><p id="reciever">
+  </p>
+    <input type="text" name="message" id='inputMsg' autofocus>
+    <input type="submit" value="Send" id="msgBtn"  onclick="postMessage()">
 </div>
-  
   <script>
-    let user_by = {%for by in user %}{{ by.id }} {% endfor %}
-    let user_by_username = "{%for by in user%}{{by.username}}{%endfor%}"
-    let user_to = '  '
+    let user_by = document.getElementById('sender').innerHTML
     var api_get_msg = `${window.location}get-api/`
     var api_get_user = `${window.location}get-user/`
+    var api_post_msg= `${window.location}post-api/`
     let msg_div = document.getElementById("messageContainer");
-    function openChat(to) {
+    let message= document.getElementById('inputMsg').value;
+    let to_id;
+    let sendMessage=document.getElementById("sendMessage");
+    sendMessage.style="display:none;";
+function openChat(to) {
         resetBg()
       document.getElementById(`txt${to}`).style="background:aqua;border-color:aqua;"
       msg_div.innerHTML = ""
@@ -126,16 +131,13 @@
               date= getDate(data[`${i}`]["at"])
               txts = data[`${i}`]["message"]
               id= data[`${i}`]["id"]
-              msg_div.innerHTML += `<div class="container darker" id="${id}" ><p> ${txts} :${user_by_username}</p><span>${date}</span></div>`
+              msg_div.innerHTML += `<div class="container " id="text.1-${id}" ><p> ${txts} </p><span><p class="date">${date}</p></span></div>`
             }
-
-          } else console.log("No messages")
+              } else console.log("No messages")
         })
         .catch(error => {
           console.error('Error:', error);
         });
-
-
         fetch(get_sent)
         .then(response => {
           if (!response.ok) {
@@ -151,23 +153,43 @@
              date= getDate(data[`${i}`]["at"])
               txts = data[`${i}`]["message"]
               id= data[`${i}`]["id"]
-              msg_div.innerHTML += `<div class="container" id="msg-${id}" ><p> ${txts} :${user_by_username}</p><span>${date}</span></div>`
+              msg_div.innerHTML += `<div class="container darker" id="text.1-${id}"  ><p> ${txts}</p><span><p class="date">${date}</p></span></div>`
             }
-
+            sortMsg()
           } else console.log("No messages")
         })
         .catch(error => {
           console.error('Error:', error);
         });
-        
-            }
-    function resetBg() {
+        sendMessage.style="display:block;";
+
+        storeTo(to);
+        var ssn_to = sessionStorage.setItem('to_id', to);
+      }
+function resetBg() {
   var friends = document.getElementsByClassName('friends');
   for(i = 0; i < friends.length; i++) {
     friends[i].style='background: rgb(0, 255, 136);';
+  }}
+function postMessage(){
+  let message = document.getElementById('inputMsg').value;
+  user_by = parseInt(user_by);
+  let data = {
+        by: user_by,
+        to: to_id,
+        message: message
+    }
+    console.log(data)
+  fetch("{%url 'post-message'%}", {
+    method: "POST",
+    headers: {'Content-Type': 'application/json',
+    'X-CSRFToken': "{{csrf_token}}"}, 
+    body: JSON.stringify(data)
+  }).then(res => {
+    console.log("Request complete! response:", res);
+    to_id=to_id;
+  }).catch(error => console.error('Error:', error));
   }
-}
-
 function getDate(dt){
 var day = new Date(dt).getDate()
 var hour = new Date(dt).getHours()
@@ -176,9 +198,6 @@ var month = new Date(dt).getMonth()
 date= `On ${month}-${day} at ${hour}:${mins}`
 return date
 }
-
-
-
 function sortMsg(){
 var toSort = document.getElementById('messageContainer').children;
 toSort = Array.prototype.slice.call(toSort, 0);
@@ -190,7 +209,7 @@ toSort.sort(function(a, b) {
     return (aord > bord) ? 1 : -1;
 });
 
-var parent = document.getElementById('list');
+var parent = document.getElementById('messageContainer');
 parent.innerHTML = "";
 
 for(var i = 0, l = toSort.length; i < l; i++) {
@@ -198,12 +217,92 @@ for(var i = 0, l = toSort.length; i < l; i++) {
 }
 
 }
+function continueChat(){
+  var api_cont_msg = `${window.location}msg-api/`
+  var to= parseInt(sessionStorage.getItem('to_id'));
+  var get_sent = `${api_cont_msg}${to}/${user_by}`
+  var get_recieved = `${api_cont_msg}${user_by}/${to}`
+  fetch(get_sent)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Chat fetching error');
+            }
+            return response.json();
+          })
+          .then(data => {
+            var data = data['data']
+            if (data.length >= 1) {
+              console.log(data)
+              for (var i = 0; i < data.length; i++) {
+                date= getDate(data[`${i}`]["at"])
+                txts = data[`${i}`]["message"]
+                id= data[`${i}`]["id"]
+                var element= document.getElementById(`text.1-${id}`)
+                if (!element) {
+                  msg_div.innerHTML += `<div class="container " id="text.1-${id}" ><p> ${txts} </p><span><p class="date">${date}</p></span></div>`
+                  ;}else{console.log("No new messages")
+              };
+              sortMsg()
+              }
+              
+            }console.log("No messages")
+          }).catch(error => {
+            console.error('Error:', error);
+          });
+  fetch(get_sent)
+  .then(response => {
+    if (!response.ok) {
+    throw new Error('Chat fetching error');
+  }
+  return response.json();
+    })
+    .then(data => {
+      var data = data['recieved']
+      if (data.length >= 1) {
+        console.log(data)
+        for (var i = 0; i < data.length; i++) {
+          date= getDate(data[`${i}`]["at"])
+                txts = data[`${i}`]["message"]
+                id= data[`${i}`]["id"]
+                var element= document.getElementById(`text.1-${id}`)
+                if (!element) {
+                  msg_div.innerHTML += `<div class="container darker" id="text.1-${id}" ><p> ${txts} </p><span><p class="date">${date}</p></span></div>`
+                  ;}else{console.log("No new messages")
+              };
+              sortMsg()
+      } 
+    } else console.log("No messages")   
+})}
+function storeTo(to){
+  var idMsg = document.getElementById('msgBtn');
+  idMsg.onclick = function(){
+    to_id=to;
+    console.log(to_id)
+    postMessage()
+    inputMsg.value="";
+    continueChat()
+  }
+  }
+  // var sk = int(sessionStorage.getItem('ssn_to'));
+  console.log(sessionStorage.getItem('to_id'))
+var input = document.getElementById("msgBtn");
 
+// Execute a function when the user presses a key on the keyboard
+input.addEventListener("keypress", function(event) {
+  // If the user presses the "Enter" key on the keyboard
+  if (event.key === "Enter") {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("msgBtn").click();
+  }
+});
+  if (sessionStorage.getItem('to_id') != null){
+    openChat(sessionStorage.getItem('to_id'))
+    setInterval(continueChat,3000)
+  }
 
-
-
-
-  </script>
+</script>
 </body>
 
 </html>
