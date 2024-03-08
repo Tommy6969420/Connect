@@ -87,13 +87,6 @@
 
   </div>
   <div id="messageContainer">
-    <div class="container" >
-      <p>Hello. How are you today?</p>
-    </div>
-
-    <div class="container darker" id="messageContainer">
-      <p>Hey! I'm fine. Thanks for asking!</p>
-    </div>
   </div>
 <div class="sendMessage">
   <p>Send Messages:</p>
@@ -116,8 +109,9 @@
         resetBg()
       document.getElementById(`txt${to}`).style="background:aqua;border-color:aqua;"
       msg_div.innerHTML = ""
-      get_msg = `${api_get_msg}${to}/${user_by}`
-      fetch(get_msg)
+      get_sent = `${api_get_msg}${to}/${user_by}`
+      get_recieved = `${api_get_msg}${user_by}/${to}`
+      fetch(get_sent)
         .then(response => {
           if (!response.ok) {
             throw new Error('Chat fetching error');
@@ -129,8 +123,10 @@
           if (data.length >= 1) {
             console.log(data)
             for (var i = 0; i < data.length; i++) {
+              date= getDate(data[`${i}`]["at"])
               txts = data[`${i}`]["message"]
-              msg_div.innerHTML += `<div class="container darker"><p> ${txts} :${user_by_username}</div></p>`
+              id= data[`${i}`]["id"]
+              msg_div.innerHTML += `<div class="container darker" id="${id}" ><p> ${txts} :${user_by_username}</p><span>${date}</span></div>`
             }
 
           } else console.log("No messages")
@@ -138,13 +134,75 @@
         .catch(error => {
           console.error('Error:', error);
         });
-    }
+
+
+        fetch(get_sent)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Chat fetching error');
+          }
+          return response.json();
+        })
+        .then(data => {
+          var data = data['recieved']
+          if (data.length >= 1) {
+            console.log(data)
+            for (var i = 0; i < data.length; i++) {
+             date= getDate(data[`${i}`]["at"])
+              txts = data[`${i}`]["message"]
+              id= data[`${i}`]["id"]
+              msg_div.innerHTML += `<div class="container" id="msg-${id}" ><p> ${txts} :${user_by_username}</p><span>${date}</span></div>`
+            }
+
+          } else console.log("No messages")
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+        
+            }
     function resetBg() {
   var friends = document.getElementsByClassName('friends');
   for(i = 0; i < friends.length; i++) {
     friends[i].style='background: rgb(0, 255, 136);';
   }
 }
+
+function getDate(dt){
+var day = new Date(dt).getDate()
+var hour = new Date(dt).getHours()
+var mins = new Date(dt).getMinutes()
+var month = new Date(dt).getMonth()
+date= `On ${month}-${day} at ${hour}:${mins}`
+return date
+}
+
+
+
+function sortMsg(){
+var toSort = document.getElementById('messageContainer').children;
+toSort = Array.prototype.slice.call(toSort, 0);
+
+toSort.sort(function(a, b) {
+    var aord = +a.id.split('-')[1];
+    var bord = +b.id.split('-')[1];
+    // two elements never have the same ID hence this is sufficient:
+    return (aord > bord) ? 1 : -1;
+});
+
+var parent = document.getElementById('list');
+parent.innerHTML = "";
+
+for(var i = 0, l = toSort.length; i < l; i++) {
+    parent.appendChild(toSort[i]);
+}
+
+}
+
+
+
+
+
   </script>
 </body>
 

@@ -7,4 +7,4 @@ class UserSerialzer(serializers.ModelSerializer):
 class MessagingSerializer(serializers.ModelSerializer):
     class Meta:
         model=Messaging
-        exclude=['id']
+        fields="__all__"

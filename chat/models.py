@@ -16,5 +16,6 @@ class Messaging(models.Model):
     by=models.ForeignKey(Connect,related_name="sender",on_delete=models.CASCADE)
     to=models.ForeignKey(Connect,on_delete=models.CASCADE)
     message=models.TextField()
+    at=models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f"{self.by.user.id} {self.by} --> {self.to.user.id} {self.to} --> {self.message}"
